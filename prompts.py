@@ -19,7 +19,7 @@ transcribe_prompt_works = {
     "Please provide the diarization results.\n",
 }
 
-transcribe_prompt = {
+transcribe_prompt_old = {
     "type": "text",
     "text": "You are given an audio recording in Catalan language with multiple speakers. Your task is to separate the speech segments by speaker and assign a unique speaker label to each segment. Output the start time, end time, and speaker ID for each segment and gender.",
     # "Format:\n"
@@ -28,4 +28,4 @@ transcribe_prompt = {
 
 
 # Does not seem to honor JSON
-transcribe_prompt = {"type": "text", "text": "Transcribe the audio file in Catalan.\n"}
+transcribe_prompt = {"type": "text", "text": "Transcribe the audio file in Catalan language.\n"}
