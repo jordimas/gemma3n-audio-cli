@@ -62,7 +62,7 @@ def main():
 
     with open(output_path, "w") as outfile:
         for result in results:
-            outfile.write(result)
+            outfile.write(result + "\n")
 
     print(f"File copied to {output_path}")
 
