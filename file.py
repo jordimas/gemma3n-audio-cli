@@ -1,20 +1,22 @@
 import torchaudio
 import torch
-import numpy as np
-from torchaudio.pipelines import WAV2VEC2_ASR_BASE_960H
 import torchaudio.transforms as T
-
-print(f"threads: {torch.get_num_threads()}")
-torch.set_num_threads(12) 
-print(f"threads: {torch.get_num_threads()}")
-
-# Load Silero VAD model
-torch.set_num_threads(1)  # Optional: improves performance in some environments
-vad_model, utils = torch.hub.load(repo_or_dir='snakers4/silero-vad', model='silero_vad')
-(get_speech_timestamps, _, _, _, _) = utils
 
 
 def process_file(filename, model, processor, prompt, use_vad=False):
+
+    if use_vad:
+        print(f"threads: {torch.get_num_threads()}")
+        torch.set_num_threads(12)
+        print(f"threads: {torch.get_num_threads()}")
+
+        # Load Silero VAD model
+        torch.set_num_threads(1)  # Optional: improves performance in some environments
+        vad_model, utils = torch.hub.load(
+            repo_or_dir="snakers4/silero-vad", model="silero_vad"
+        )
+        (get_speech_timestamps, _, _, _, _) = utils
+
     waveform, sample_rate = torchaudio.load(filename)
     if waveform.shape[0] > 1:
         waveform = torch.mean(waveform, dim=0, keepdim=True)
@@ -31,12 +33,14 @@ def process_file(filename, model, processor, prompt, use_vad=False):
 
     if use_vad:
         # Apply VAD to get speech timestamps
-        speech_timestamps = get_speech_timestamps(waveform, vad_model, sampling_rate=sample_rate)
+        speech_timestamps = get_speech_timestamps(
+            waveform, vad_model, sampling_rate=sample_rate
+        )
 
         # Concatenate speech segments
-        waveform = torch.cat([
-            waveform[:, ts['start']:ts['end']] for ts in speech_timestamps
-        ], dim=1)
+        waveform = torch.cat(
+            [waveform[:, ts["start"] : ts["end"]] for ts in speech_timestamps], dim=1
+        )
 
         print(f"VAD-reduced duration: {waveform.shape[1] / sample_rate:.2f} seconds")
 
@@ -88,4 +92,3 @@ def process_file(filename, model, processor, prompt, use_vad=False):
         all_outputs.append(answer)
 
     return all_outputs
-

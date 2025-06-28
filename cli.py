@@ -4,7 +4,7 @@ from transformers import AutoProcessor, AutoModelForImageTextToText
 from file import process_file
 
 GEMMA_MODEL_ID = "google/gemma-3n-E4B-it"
-#GEMMA_MODEL_ID = "~/.cache/huggingface/hub/models--google--gemma-3n-E4B-it"  # or wherever your cache is
+# GEMMA_MODEL_ID = "~/.cache/huggingface/hub/models--google--gemma-3n-E4B-it"  # or wherever your cache is
 
 
 processor = AutoProcessor.from_pretrained(GEMMA_MODEL_ID, device_map="")
@@ -19,34 +19,30 @@ identify_lang_prompt = {
     "- confidence level from 0 to 1 of the language identified\n",
 }
 
-# Does not seem to honor JSON
-transcribe_prompt = {
-    "type": "text",
-    "text": "Transcribe the audio file in Catalan.\n"
-}
 
 transcribe_prompt_works = {
     "type": "text",
     "text": "You are given an audio recording in Catalan language with multiple speakers. Your task is to separate the speech segments by speaker and assign a unique speaker label to each segment. Output the start time, end time, and speaker ID for each segment."
-"Format:\n"
-"[start_time - end_time] Speaker_ID: Transcription (optional)\n"
-"\n"
-"Example:\n"
-"[00:00:00 - 00:00:05] Speaker_1: Hello, how are you?\n"
-"[00:00:06 - 00:00:10] Speaker_2: I'm good, thanks!\n"
-"\n"
-"Please provide the diarization results.\n"    
-    
-} 
+    "Format:\n"
+    "[start_time - end_time] Speaker_ID: Transcription (optional)\n"
+    "\n"
+    "Example:\n"
+    "[00:00:00 - 00:00:05] Speaker_1: Hello, how are you?\n"
+    "[00:00:06 - 00:00:10] Speaker_2: I'm good, thanks!\n"
+    "\n"
+    "Please provide the diarization results.\n",
+}
 
 transcribe_prompt = {
     "type": "text",
-    "text": "You are given an audio recording in Catalan language with multiple speakers. Your task is to separate the speech segments by speaker and assign a unique speaker label to each segment. Output the start time, end time, and speaker ID for each segment and gender."
-#"Format:\n"
-#"[start_time - end_time] Speaker_ID: Transcription\n"
-}    
+    "text": "You are given an audio recording in Catalan language with multiple speakers. Your task is to separate the speech segments by speaker and assign a unique speaker label to each segment. Output the start time, end time, and speaker ID for each segment and gender.",
+    # "Format:\n"
+    # "[start_time - end_time] Speaker_ID: Transcription\n"
+}
 
 
+# Does not seem to honor JSON
+transcribe_prompt = {"type": "text", "text": "Transcribe the audio file in Catalan.\n"}
 
 
 start_time = time.time()
@@ -57,8 +53,8 @@ filename = "dosparlants.mp3"
 all_outputs = process_file(filename, model, processor, transcribe_prompt)
 
 # Combine and print results
-#print("==== FINAL RESULT ====")
-#for i, segment in enumerate(all_outputs):
+# print("==== FINAL RESULT ====")
+# for i, segment in enumerate(all_outputs):
 #    print(f"{segment}")
 
 # End timing
