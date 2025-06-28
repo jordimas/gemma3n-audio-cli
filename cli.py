@@ -16,9 +16,10 @@ identify_lang_prompt = {
     "- confidence level from 0 to 1 of the language identified\n",
 }
 
+# Does not seem to honor JSON
 transcribe_prompt = {
     "type": "text",
-    "text": "Transcribe the audio file to text with maximum accuracy.\n",
+    "text": "Transcribe the audio file in Catalan with maximum accuracy\n"
 }
 
 
@@ -30,4 +31,4 @@ all_outputs = process_file(filename, model, processor, transcribe_prompt)
 # Combine and print results
 print("==== FINAL RESULT ====")
 for i, segment in enumerate(all_outputs):
-    print(f"[Segment {i}] {segment}")
+    print(f"{segment}")

@@ -5,6 +5,7 @@ def process_file(filename, model, processor, prompt):
     waveform, sample_rate = torchaudio.load(filename)
     t = waveform.shape[1] / sample_rate
     print(f"{filename} - {t:.2f} seconds")
+    print(f"prompt: {prompt}")
 
     chunk_duration = 30  # seconds
     chunk_samples = int(chunk_duration * sample_rate)
