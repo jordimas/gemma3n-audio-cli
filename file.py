@@ -50,16 +50,17 @@ def process_file(filename, model, processor, prompt):
         # Generate response
         outputs = model.generate(
             **input_ids,
-            max_new_tokens=128,
+            max_new_tokens=8192,
             return_dict_in_generate=True,
-            output_scores=True
+            output_scores=True,
+            #temperature=0.1
         )
 
         # Extract only the generated part
         generated_ids = outputs.sequences[0][input_len:]
         answer = processor.decode(generated_ids, skip_special_tokens=True).strip()
 
-        print(f"processing: {answer}")
+        print(f"{answer}")
         all_outputs.append(answer)
 
     return all_outputs
