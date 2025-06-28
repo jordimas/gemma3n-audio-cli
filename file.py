@@ -81,9 +81,9 @@ def process_file(filename, model, processor, prompt, use_vad=False):
 
         outputs = model.generate(
             **input_ids,
-            max_new_tokens=8192,
+            max_new_tokens=256,
             return_dict_in_generate=True,
-            output_scores=True,
+            output_scores=False,  # Don't compute per-token scores
         )
 
         generated_ids = outputs.sequences[0][input_len:]
