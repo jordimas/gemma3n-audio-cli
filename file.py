@@ -2,9 +2,9 @@ import torchaudio
 import torch
 import torchaudio.transforms as T
 
-#print(f"threads: {torch.get_num_threads()}")
-#torch.set_num_threads(12)
-#print(f"threads: {torch.get_num_threads()}")
+# print(f"threads: {torch.get_num_threads()}")
+# torch.set_num_threads(12)
+# print(f"threads: {torch.get_num_threads()}")
 
 
 def process_file(filename, model, processor, prompt, use_vad=False):
@@ -27,7 +27,7 @@ def process_file(filename, model, processor, prompt, use_vad=False):
 
     # Resample if not 16000 Hz
     target_sample_rate = 16000
-    if sample_rate != target_sample_rate:
+    if use_vad and sample_rate != target_sample_rate:
         resampler = T.Resample(orig_freq=sample_rate, new_freq=target_sample_rate)
         waveform = resampler(waveform)
         sample_rate = target_sample_rate

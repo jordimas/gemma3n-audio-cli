@@ -2,10 +2,10 @@ import torch
 import time
 from transformers import AutoProcessor, AutoModelForImageTextToText
 from file import process_file
+import argparse
 import os
 
 GEMMA_MODEL_ID = "google/gemma-3n-E2B-it"
-# GEMMA_MODEL_ID = "~/.cache/huggingface/hub/models--google--gemma-3n-E4B-it"  # or wherever your cache is
 
 os.environ["TRANSFORMERS_OFFLINE"] = "1"
 
@@ -48,23 +48,54 @@ transcribe_prompt = {
 transcribe_prompt = {"type": "text", "text": "Transcribe the audio file in Catalan.\n"}
 
 
-start_time = time.time()
+def transcribe_file(filename):
+    start_time = time.time()
 
-filename = "dosparlants.mp3"
-# filename = "15GdH9-curt.mp3"
+    # filename = "dosparlants.mp3"
+    # filename = "15GdH9-curt.mp3"
 
-use_vad = False
-all_outputs = process_file(filename, model, processor, transcribe_prompt, use_vad)
+    use_vad = False
+    all_outputs = process_file(filename, model, processor, transcribe_prompt, use_vad)
 
-# Combine and print results
-# print("==== FINAL RESULT ====")
-# for i, segment in enumerate(all_outputs):
-#    print(f"{segment}")
+    # Combine and print results
+    # print("==== FINAL RESULT ====")
+    # for i, segment in enumerate(all_outputs):
+    #    print(f"{segment}")
 
-# End timing
-end_time = time.time()
-elapsed_time = end_time - start_time
+    # End timing
+    end_time = time.time()
+    elapsed_time = end_time - start_time
 
-# Print total time used
-print(f"Vad: {use_vad}")
-print(f"Total time used: {elapsed_time:.2f} seconds")
+    # Print total time used
+    print(f"Vad: {use_vad}")
+    print(f"Total time used: {elapsed_time:.2f} seconds")
+    return all_outputs
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Process an input file and output directory."
+    )
+
+    parser.add_argument(
+        "--output_dir", type=str, default="output", help="Path to the output directory."
+    )
+
+    parser.add_argument("input_file", type=str, help="Path to the input file.")
+
+    args = parser.parse_args()
+
+    results = transcribe_file(args.input_file)
+
+    output_path = os.path.join(
+        args.output_dir, os.path.basename(args.input_file) + ".txt"
+    )
+    with open(output_path, "w") as outfile:
+        for result in results:
+            outfile.write(result)
+
+    print(f"File copied to {output_path}")
+
+
+if __name__ == "__main__":
+    main()
