@@ -1,4 +1,5 @@
 import torch
+import time
 from transformers import AutoProcessor, AutoModelForImageTextToText
 from file import process_file
 
@@ -48,6 +49,8 @@ transcribe_prompt = {
 
 
 
+start_time = time.time()
+
 filename = "dosparlants.mp3"
 # filename = "15GdH9-curt.mp3"
 
@@ -57,3 +60,10 @@ all_outputs = process_file(filename, model, processor, transcribe_prompt)
 #print("==== FINAL RESULT ====")
 #for i, segment in enumerate(all_outputs):
 #    print(f"{segment}")
+
+# End timing
+end_time = time.time()
+elapsed_time = end_time - start_time
+
+# Print total time used
+print(f"Total time used: {elapsed_time:.2f} seconds")
