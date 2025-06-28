@@ -2,13 +2,12 @@ import torchaudio
 
 
 def process_file(filename, model, processor, prompt):
-
     waveform, sample_rate = torchaudio.load(filename)
     t = waveform.shape[1] / sample_rate
-    print(f"{filename} - {t}")
+    print(f"{filename} - {t:.2f} seconds")
 
     chunk_duration = 30  # seconds
-    chunk_samples = chunk_duration * sample_rate
+    chunk_samples = int(chunk_duration * sample_rate)
 
     # Split into chunks
     chunks = [
@@ -17,13 +16,13 @@ def process_file(filename, model, processor, prompt):
     ]
     print(f"chunks: {len(chunks)}")
 
-    # Iterate over chunks
     all_outputs = []
     for i, chunk in enumerate(chunks):
-        # Save temporary audio file for each chunk
+        # Save temporary audio file
         temp_filename = f"chunk_{i}.wav"
         torchaudio.save(temp_filename, chunk, sample_rate)
 
+        # Build message input
         messages = [
             {
                 "role": "user",
@@ -34,6 +33,7 @@ def process_file(filename, model, processor, prompt):
             }
         ]
 
+        # Convert chat to token IDs
         input_ids = processor.apply_chat_template(
             messages,
             add_generation_prompt=True,
@@ -43,14 +43,23 @@ def process_file(filename, model, processor, prompt):
         )
         input_ids = input_ids.to(model.device, dtype=model.dtype)
 
-        outputs = model.generate(**input_ids, max_new_tokens=128)
+        # Track input length for slicing generated output
+        input_len = input_ids["input_ids"].shape[-1]
 
-        text = processor.batch_decode(
-            outputs,
-            skip_special_tokens=True,
-            clean_up_tokenization_spaces=False,
-            return_full_text=False,  # <- only returns new tokens, i.e., model output
+        # Generate response
+        outputs = model.generate(
+            **input_ids,
+            max_new_tokens=128,
+            return_dict_in_generate=True,
+            output_scores=True
         )
-        print(f"processing: {text[0]}")
-        all_outputs.append(text[0])
+
+        # Extract only the generated part
+        generated_ids = outputs.sequences[0][input_len:]
+        answer = processor.decode(generated_ids, skip_special_tokens=True).strip()
+
+        print(f"processing: {answer}")
+        all_outputs.append(answer)
+
     return all_outputs
+
