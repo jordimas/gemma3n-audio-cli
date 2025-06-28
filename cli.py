@@ -50,7 +50,8 @@ start_time = time.time()
 filename = "dosparlants.mp3"
 # filename = "15GdH9-curt.mp3"
 
-all_outputs = process_file(filename, model, processor, transcribe_prompt)
+use_vad = True
+all_outputs = process_file(filename, model, processor, transcribe_prompt, use_vad)
 
 # Combine and print results
 # print("==== FINAL RESULT ====")
@@ -62,4 +63,6 @@ end_time = time.time()
 elapsed_time = end_time - start_time
 
 # Print total time used
+print(f"Vad: {use_vad}")
 print(f"Total time used: {elapsed_time:.2f} seconds")
+
