@@ -17,7 +17,6 @@ model = AutoModelForImageTextToText.from_pretrained(
 )
 
 
-
 def transcribe_file(filename):
     start_time = time.time()
 
@@ -56,12 +55,10 @@ def main():
     args = parser.parse_args()
 
     results = transcribe_file(args.input_file)
-    
+
     audio_basename = os.path.basename(args.input_file)
     audio_basename = os.path.splitext(audio_basename)[0]
-    output_path = os.path.join(
-        self.output_dir, audio_basename + "." + "text"
-    )    
+    output_path = os.path.join(args.output_dir, audio_basename + "." + "txt")
 
     with open(output_path, "w") as outfile:
         for result in results:
