@@ -2,13 +2,14 @@ import torchaudio
 import torch
 import torchaudio.transforms as T
 
+#print(f"threads: {torch.get_num_threads()}")
+#torch.set_num_threads(12)
+#print(f"threads: {torch.get_num_threads()}")
+
 
 def process_file(filename, model, processor, prompt, use_vad=False):
 
     if use_vad:
-        print(f"threads: {torch.get_num_threads()}")
-        torch.set_num_threads(12)
-        print(f"threads: {torch.get_num_threads()}")
 
         # Load Silero VAD model
         torch.set_num_threads(1)  # Optional: improves performance in some environments
@@ -30,6 +31,7 @@ def process_file(filename, model, processor, prompt, use_vad=False):
         resampler = T.Resample(orig_freq=sample_rate, new_freq=target_sample_rate)
         waveform = resampler(waveform)
         sample_rate = target_sample_rate
+        print("resampled")
 
     if use_vad:
         # Apply VAD to get speech timestamps

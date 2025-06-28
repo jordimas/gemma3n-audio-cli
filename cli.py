@@ -2,9 +2,12 @@ import torch
 import time
 from transformers import AutoProcessor, AutoModelForImageTextToText
 from file import process_file
+import os
 
-GEMMA_MODEL_ID = "google/gemma-3n-E4B-it"
+GEMMA_MODEL_ID = "google/gemma-3n-E2B-it"
 # GEMMA_MODEL_ID = "~/.cache/huggingface/hub/models--google--gemma-3n-E4B-it"  # or wherever your cache is
+
+os.environ["TRANSFORMERS_OFFLINE"] = "1"
 
 
 processor = AutoProcessor.from_pretrained(GEMMA_MODEL_ID, device_map="")
