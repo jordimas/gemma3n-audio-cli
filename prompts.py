@@ -32,3 +32,9 @@ transcribe_prompt = {
     "type": "text",
     "text": "Transcribe the audio file in English language.\n",
 }
+
+
+transcribe_prompt = {
+    "type": "text",
+    "text": "Please transcribe the following audio into accurate, fluent English. Focus on verbatim transcription, ensuring no content is added, omitted, or hallucinated. Transcribe only what is spoken. If there are non-speech sounds like [laughter] or [noise], or if a word is incomprehensible, mark it as [inaudible]. Do not repeat words unless they are repeated in the audio. Prioritize correct spelling and grammar in English. Maintain original phrasing and word order.",
+}

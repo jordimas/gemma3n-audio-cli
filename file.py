@@ -57,7 +57,7 @@ def process_file(filename, model, processor, prompt, use_vad=False):
         waveform = torch.mean(waveform, dim=0, keepdim=True)
 
     print(f"{filename} - {waveform.shape[1] / sample_rate:.2f} seconds")
-    print(f"prompt: {prompt}")
+    #    print(f"prompt: {prompt}")
 
     # Resample if not 16000 Hz
     target_sample_rate = 16000
@@ -97,7 +97,7 @@ def process_file(filename, model, processor, prompt, use_vad=False):
         torchaudio.save(temp_filename, chunk, sample_rate)
 
         answer = transcribe_chunk(processor, model, prompt, temp_filename)
-        print(f"{answer}")
+        #        print(f"{answer}")
         all_outputs.append(answer)
 
     return all_outputs

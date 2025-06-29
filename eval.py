@@ -13,7 +13,7 @@ def main():
     print("Tool evaluation")
 
     os.environ["HF_HUB_DOWNLOAD_TIMEOUT"] = "60"
-    MAX_SAMPLES = 2
+    MAX_SAMPLES = 50
     datasets = ["mozilla-foundation/common_voice_16_1"]
 
     wer_metric = load_metric("wer")
@@ -22,6 +22,10 @@ def main():
     for dataset in datasets:
         dataset_iter = load_dataset(dataset, "en", split="test", streaming=True)
         dataset_iter = islice(dataset_iter, MAX_SAMPLES)
+        #        dataset_obj = load_dataset(dataset, "en", split="test")[:MAX_SAMPLES]
+        #        print(f"Loaded {len(dataset_obj)} samples")
+        #        print(dataset_obj.keys())/7
+        #        dataset_iter = dataset_obj.select(range(min(MAX_SAMPLES, len(dataset_obj))))
 
         predictions = []
         references = []
@@ -29,7 +33,7 @@ def main():
         start_time = time.time()
 
         for i, sample in enumerate(tqdm(dataset_iter, desc=f"Transcribing {dataset}")):
-            # print(sample)
+            #            print(f"sample: {sample}" )
             filename = f"audios/output_{i}.wav"
             audio = sample["audio"]
             chunk = audio["array"]
@@ -53,8 +57,8 @@ def main():
         sample_count = len(references)
 
         # Compute WER
-        print(f"references: {references}")
-        print(f"predictions: {predictions}")
+        #        print(f"references: {references}")
+        #        print(f"predictions: {predictions}")
 
         wer_score = wer_metric.compute(predictions=predictions, references=references)
         wer_score = wer_score * 100
@@ -66,7 +70,7 @@ def main():
 
         # Print stats
         print(f"Samples processed: {sample_count}")
-        print(f"WER for {dataset}: {wer_score:.2f}%")
+        print(f"WER for {dataset}: {wer_score:.2f}")
         print(f"Total inference time: {total_time:.2f} seconds")
         print(f"Average time per sample: {total_time / sample_count:.2f} seconds")
 
