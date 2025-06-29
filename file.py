@@ -2,11 +2,6 @@ import torchaudio
 import torch
 import torchaudio.transforms as T
 
-# print(f"threads: {torch.get_num_threads()}")
-# torch.set_num_threads(12)
-# print(f"threads: {torch.get_num_threads()}")
-
-
 def transcribe_chunk(processor, model, prompt, chunk):
     messages = [
         {
@@ -41,33 +36,47 @@ def transcribe_chunk(processor, model, prompt, chunk):
     return answer
 
 
+# Requirements https://ai.google.dev/gemma/docs/capabilities/audio
+
+
+def _get_waveform(filename):
+    # Load audio
+    waveform, sample_rate = torchaudio.load(filename)
+
+    # Convert to mono if stereo (by averaging channels)
+    if waveform.shape[0] > 1:
+        waveform = torch.mean(waveform, dim=0, keepdim=True)
+
+    # Convert to float32 if needed (torchaudio usually returns float32 already, but we ensure it)
+    waveform = waveform.to(torch.float32)
+
+    # Scale int16 audio if needed (torchaudio.load handles scaling, but add check if using raw decoding)
+    if waveform.max() > 1.0 or waveform.min() < -1.0:
+        # Assume raw int16 range [-32768, 32767]
+        waveform /= 32768.0
+
+    # Resample to 16kHz if needed
+    target_sample_rate = 16000
+    if sample_rate != target_sample_rate:
+        resampler = T.Resample(orig_freq=sample_rate, new_freq=target_sample_rate)
+        waveform = resampler(waveform)
+        sample_rate = target_sample_rate
+        print("Resampled to 16 kHz")
+
+    print(f"{filename} - {waveform.shape[1] / sample_rate:.2f} seconds")
+    return waveform, sample_rate
+
+
 def process_file(filename, model, processor, prompt, use_vad=False):
+    waveform, sample_rate = _get_waveform(filename)
 
     if use_vad:
-
-        # Load Silero VAD model
-        torch.set_num_threads(1)  # Optional: improves performance in some environments
+        torch.set_num_threads(1)
         vad_model, utils = torch.hub.load(
             repo_or_dir="snakers4/silero-vad", model="silero_vad"
         )
         (get_speech_timestamps, _, _, _, _) = utils
 
-    waveform, sample_rate = torchaudio.load(filename)
-    if waveform.shape[0] > 1:
-        waveform = torch.mean(waveform, dim=0, keepdim=True)
-
-    print(f"{filename} - {waveform.shape[1] / sample_rate:.2f} seconds")
-    #    print(f"prompt: {prompt}")
-
-    # Resample if not 16000 Hz
-    target_sample_rate = 16000
-    if use_vad and sample_rate != target_sample_rate:
-        resampler = T.Resample(orig_freq=sample_rate, new_freq=target_sample_rate)
-        waveform = resampler(waveform)
-        sample_rate = target_sample_rate
-        print("resampled")
-
-    if use_vad:
         # Apply VAD to get speech timestamps
         speech_timestamps = get_speech_timestamps(
             waveform, vad_model, sampling_rate=sample_rate

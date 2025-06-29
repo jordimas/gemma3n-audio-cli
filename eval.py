@@ -13,7 +13,7 @@ def main():
     print("Tool evaluation")
 
     os.environ["HF_HUB_DOWNLOAD_TIMEOUT"] = "60"
-    MAX_SAMPLES = 50
+    MAX_SAMPLES = 200
     datasets = ["mozilla-foundation/common_voice_16_1"]
 
     wer_metric = load_metric("wer")
