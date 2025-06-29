@@ -1,4 +1,3 @@
-import torch
 import time
 from transformers import AutoProcessor, AutoModelForImageTextToText
 from file import process_file
@@ -6,39 +5,26 @@ import argparse
 import os
 from prompts import transcribe_prompt
 
-GEMMA_MODEL_ID = "google/gemma-3n-E4B-it"
+GEMMA_MODEL_ID = "google/gemma-3n-E2B-it"
 
 os.environ["TRANSFORMERS_OFFLINE"] = "1"
 
 
-processor = AutoProcessor.from_pretrained(GEMMA_MODEL_ID, device_map="")
+processor = AutoProcessor.from_pretrained(GEMMA_MODEL_ID, device_map="auto")
 model = AutoModelForImageTextToText.from_pretrained(
-    GEMMA_MODEL_ID, torch_dtype="auto", device_map="cpu"
+    GEMMA_MODEL_ID, torch_dtype="auto", device_map="auto"
 )
 
 
-def transcribe_file(filename):
+def transcribe_file(filename, use_vad=False):
     start_time = time.time()
-
-    # filename = "dosparlants.mp3"
-    # filename = "15GdH9-curt.mp3"
-
-    use_vad = False
     all_outputs = process_file(filename, model, processor, transcribe_prompt, use_vad)
 
-    # Combine and print results
-    # print("==== FINAL RESULT ====")
-    # for i, segment in enumerate(all_outputs):
-    #    print(f"{segment}")
-
-    # End timing
     end_time = time.time()
     elapsed_time = end_time - start_time
 
     # Print total time used
-    print(f"Vad: {use_vad}")
-    print(f"Total time used: {elapsed_time:.2f} seconds")
-    return all_outputs
+    return all_outputs, elapsed_time
 
 
 def main():
@@ -54,7 +40,8 @@ def main():
 
     args = parser.parse_args()
 
-    results = transcribe_file(args.input_file)
+    results, elapsed_time = transcribe_file(args.input_file)
+    print(f"Total time used: {elapsed_time:.2f} seconds")
 
     audio_basename = os.path.basename(args.input_file)
     audio_basename = os.path.splitext(audio_basename)[0]

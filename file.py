@@ -92,8 +92,8 @@ def process_file(filename, model, processor, prompt, use_vad=False):
 
     all_outputs = []
     for i, chunk in enumerate(chunks):
-#        temp_filename = f"chunk_{i}.wav"
-        temp_filename = f"chunk.wav"
+        #        temp_filename = f"chunk_{i}.wav"
+        temp_filename = "chunk.wav"
         torchaudio.save(temp_filename, chunk, sample_rate)
 
         answer = transcribe_chunk(processor, model, prompt, temp_filename)
