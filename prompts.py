@@ -30,5 +30,5 @@ transcribe_prompt_old = {
 # Does not seem to honor JSON
 transcribe_prompt = {
     "type": "text",
-    "text": "Transcribe the audio file in Catalan language.\n",
+    "text": "Transcribe the audio file in English language.\n",
 }
