@@ -33,6 +33,7 @@ def transcribe_chunk(processor, model, prompt, chunk):
         max_new_tokens=256,
         return_dict_in_generate=True,
         output_scores=False,  # Don't compute per-token scores
+        temperature=1,
     )
 
     generated_ids = outputs.sequences[0][input_len:]
