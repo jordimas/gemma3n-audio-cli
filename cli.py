@@ -6,7 +6,7 @@ import argparse
 import os
 from prompts import transcribe_prompt
 
-GEMMA_MODEL_ID = "google/gemma-3n-E2B-it"
+GEMMA_MODEL_ID = "google/gemma-3n-E4B-it"
 
 os.environ["TRANSFORMERS_OFFLINE"] = "1"
 
