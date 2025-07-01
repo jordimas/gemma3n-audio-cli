@@ -12,9 +12,9 @@ USE_VAD = False
 os.environ["TRANSFORMERS_OFFLINE"] = "1"
 
 
-processor = AutoProcessor.from_pretrained(GEMMA_MODEL_ID, device_map="auto")
+processor = AutoProcessor.from_pretrained(GEMMA_MODEL_ID)
 model = AutoModelForImageTextToText.from_pretrained(
-    GEMMA_MODEL_ID, torch_dtype="auto", device_map="auto"
+    GEMMA_MODEL_ID, torch_dtype="auto", device_map="cuda"
 )
 
 

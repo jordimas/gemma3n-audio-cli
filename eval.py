@@ -15,7 +15,7 @@ def main():
     print("Tool evaluation")
 
     os.environ["HF_HUB_DOWNLOAD_TIMEOUT"] = "60"
-    MAX_SAMPLES = 100
+    MAX_SAMPLES = 200
     datasets = ["mozilla-foundation/common_voice_16_1"]
 
     wer_metric = load_metric("wer")
@@ -46,7 +46,7 @@ def main():
 
             # Transcribe
             prediction, elapsed_time = transcribe_file(filename)
-            prediction = str(prediction)
+            prediction = str(prediction[0])
 
             # Ground truth
             reference = sample["sentence"]

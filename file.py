@@ -1,9 +1,9 @@
 import torchaudio
 import torch
 import torchaudio.transforms as T
+import time
 
-TEMPERATURE = 1
-
+TEMPERATURE = 0.1
 
 def transcribe_chunk(processor, model, prompt, chunk):
     messages = [
@@ -16,6 +16,8 @@ def transcribe_chunk(processor, model, prompt, chunk):
         }
     ]
 
+    
+    start_time = time.time()
     input_ids = processor.apply_chat_template(
         messages,
         add_generation_prompt=True,
@@ -36,6 +38,12 @@ def transcribe_chunk(processor, model, prompt, chunk):
 
     generated_ids = outputs.sequences[0][input_len:]
     answer = processor.decode(generated_ids, skip_special_tokens=True).strip()
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print(f"transcribe_chunk: {elapsed_time:.2f} seconds")
+
+
+    
     return answer
 
 
@@ -43,6 +51,7 @@ def transcribe_chunk(processor, model, prompt, chunk):
 
 
 def _get_waveform(filename):
+    start_time = time.time()
     # Load audio
     waveform, sample_rate = torchaudio.load(filename)
 
@@ -65,6 +74,11 @@ def _get_waveform(filename):
         waveform = resampler(waveform)
         sample_rate = target_sample_rate
         print("Resampled to 16 kHz")
+
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    #print(f"_get_waveform: {elapsed_time:.2f} seconds")
+
 
     print(f"{filename} - {waveform.shape[1] / sample_rate:.2f} seconds")
     return waveform, sample_rate
