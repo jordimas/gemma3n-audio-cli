@@ -5,7 +5,9 @@ import argparse
 import os
 from prompts import transcribe_prompt
 
-GEMMA_MODEL_ID = "google/gemma-3n-E2B-it"
+GEMMA_MODEL_ID = "google/gemma-3n-E4B-it"
+USE_VAD = False
+
 
 os.environ["TRANSFORMERS_OFFLINE"] = "1"
 
@@ -16,7 +18,7 @@ model = AutoModelForImageTextToText.from_pretrained(
 )
 
 
-def transcribe_file(filename, use_vad=False):
+def transcribe_file(filename, use_vad=USE_VAD):
     start_time = time.time()
     all_outputs = process_file(filename, model, processor, transcribe_prompt, use_vad)
 

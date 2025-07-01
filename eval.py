@@ -6,14 +6,16 @@ from tqdm import tqdm
 from itertools import islice
 from datasets import load_dataset
 from evaluate import load as load_metric
-from cli import transcribe_file
+from cli import transcribe_file, GEMMA_MODEL_ID, USE_VAD
+from prompts import transcribe_prompt
+from file import TEMPERATURE
 
 
 def main():
     print("Tool evaluation")
 
     os.environ["HF_HUB_DOWNLOAD_TIMEOUT"] = "60"
-    MAX_SAMPLES = 200
+    MAX_SAMPLES = 100
     datasets = ["mozilla-foundation/common_voice_16_1"]
 
     wer_metric = load_metric("wer")
@@ -76,13 +78,20 @@ def main():
 
         # Save dataset-level stats
         lang_stats[dataset] = {
-            "wer": round(wer_score, 4),
+            "wer": round(wer_score, 2),
             "total_time_sec": round(total_time, 2),
             "avg_time_per_sample_sec": round(total_time / sample_count, 2),
             "samples": sample_count,
         }
 
-    with open("lang_stats.json", "w") as f:
+    lang_stats["configuration"] = {
+        "model": GEMMA_MODEL_ID,
+        "use_vad": USE_VAD,
+        "temperature": TEMPERATURE,
+        "prompt": transcribe_prompt,
+    }
+
+    with open("eval.json", "w") as f:
         json.dump(lang_stats, f, indent=2)
 
 
