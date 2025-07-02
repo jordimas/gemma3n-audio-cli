@@ -111,7 +111,8 @@ def process_file(filename, model, processor, prompt, use_vad=False):
         waveform[:, i : i + chunk_samples]
         for i in range(0, waveform.shape[1], chunk_samples)
     ]
-    print(f"chunks: {len(chunks)}")
+    if len(chunks) > 1:
+        print(f"chunks: {len(chunks)}")
 
     all_outputs = []
     for i, chunk in enumerate(chunks):

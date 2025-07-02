@@ -34,7 +34,13 @@ transcribe_prompt = {
 }
 
 
-transcribe_prompt = {
+transcribe_prompt_v1 = {
     "type": "text",
     "text": "Please transcribe the following audio into accurate, fluent English. Focus on verbatim transcription, ensuring no content is added, omitted, or hallucinated. Transcribe only what is spoken. If there are non-speech sounds like [laughter] or [noise], or if a word is incomprehensible, mark it as [inaudible]. Do not repeat words unless they are repeated in the audio. Prioritize correct spelling and grammar in English. Maintain original phrasing and word order.",
+}
+
+
+transcribe_prompt = { #v2
+    "type": "text",
+    "text": "Please transcribe the following audio into accurate, fluent English. Focus on verbatim transcription, ensuring no content is added, omitted, or hallucinated. Do not transalate the transcription. Transcribe only what is spoken. If there are non-speech sounds like [laughter] or [noise], or if a word is incomprehensible, do not output any text. Do not repeat words unless they are repeated in the audio. Prioritize correct spelling and grammar in English. Maintain original phrasing and word order. Avoid repeated characters.",
 }
