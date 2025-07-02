@@ -5,6 +5,7 @@ import time
 
 TEMPERATURE = 0.1
 
+
 def transcribe_chunk(processor, model, prompt, chunk):
     messages = [
         {
@@ -16,7 +17,6 @@ def transcribe_chunk(processor, model, prompt, chunk):
         }
     ]
 
-    
     start_time = time.time()
     input_ids = processor.apply_chat_template(
         messages,
@@ -42,8 +42,6 @@ def transcribe_chunk(processor, model, prompt, chunk):
     elapsed_time = end_time - start_time
     print(f"transcribe_chunk: {elapsed_time:.2f} seconds")
 
-
-    
     return answer
 
 
@@ -77,8 +75,7 @@ def _get_waveform(filename):
 
     end_time = time.time()
     elapsed_time = end_time - start_time
-    #print(f"_get_waveform: {elapsed_time:.2f} seconds")
-
+    # print(f"_get_waveform: {elapsed_time:.2f} seconds")
 
     print(f"{filename} - {waveform.shape[1] / sample_rate:.2f} seconds")
     return waveform, sample_rate
