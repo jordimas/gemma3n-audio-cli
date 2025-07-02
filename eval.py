@@ -2,7 +2,6 @@ import os
 import time
 import json
 from itertools import islice
-from tqdm import tqdm
 import soundfile as sf
 import numpy as np
 from datasets import load_dataset
@@ -39,9 +38,10 @@ def main():
 
             start_time = time.time()
 
-            for i, sample in enumerate(
-                tqdm(dataset_iter, desc=f"Transcribing {dataset}")
-            ):
+            for i, sample in enumerate(dataset_iter):
+                # for i, sample in enumerate(
+                #    tqdm(dataset_iter, desc=f"Transcribing {dataset}")
+                # ):
                 filename = f"audios/output_{i}.wav"
                 audio = sample["audio"]
                 chunk = audio["array"]
@@ -64,7 +64,7 @@ def main():
             wer_score = (
                 wer_metric.compute(predictions=predictions, references=references) * 100
             )
-            with open("results.txt.txt", "w", encoding="utf-8") as f:
+            with open("results.txt", "w", encoding="utf-8") as f:
                 for ref, pred in zip(references, predictions):
                     f.write(f"{ref}\n")
                     f.write(f"{pred}\n\n")
