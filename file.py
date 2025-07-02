@@ -81,14 +81,21 @@ def _get_waveform(filename):
     return waveform, sample_rate
 
 
+vad_model = None
+utils = None
+
+
 def process_file(filename, model, processor, prompt, use_vad=False):
+    global vad_model, utils
+
     waveform, sample_rate = _get_waveform(filename)
 
     if use_vad:
-        torch.set_num_threads(1)
-        vad_model, utils = torch.hub.load(
-            repo_or_dir="snakers4/silero-vad", model="silero_vad"
-        )
+        # torch.set_num_threads(1)
+        if not vad_model:
+            vad_model, utils = torch.hub.load(
+                repo_or_dir="snakers4/silero-vad", model="silero_vad"
+            )
         (get_speech_timestamps, _, _, _, _) = utils
 
         # Apply VAD to get speech timestamps
@@ -96,12 +103,20 @@ def process_file(filename, model, processor, prompt, use_vad=False):
             waveform, vad_model, sampling_rate=sample_rate
         )
 
-        # Concatenate speech segments
-        waveform = torch.cat(
-            [waveform[:, ts["start"] : ts["end"]] for ts in speech_timestamps], dim=1
-        )
+        if not speech_timestamps:
+            print("Warning: No speech detected by VAD.")
+        else:
+            # waveform = torch.cat(
+            #    [waveform[:, ts["start"] : ts["end"]] for ts in speech_timestamps], dim=1
+            # )
+            end = speech_timestamps[-1]["end"]
 
-        print(f"VAD-reduced duration: {waveform.shape[1] / sample_rate:.2f} seconds")
+            # Slice the waveform to keep only from start to end
+            waveform = waveform[:, 0:end]
+
+            print(
+                f"VAD-reduced duration: {waveform.shape[1] / sample_rate:.2f} seconds"
+            )
 
     chunk_duration = 30  # seconds
     chunk_samples = int(chunk_duration * sample_rate)
