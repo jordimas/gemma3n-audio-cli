@@ -2,12 +2,12 @@ import os
 import time
 import json
 from itertools import islice
+from tqdm import tqdm
 import soundfile as sf
 import numpy as np
 from datasets import load_dataset
-from cli import transcribe_file, GEMMA_MODEL_ID, USE_VAD
+from cli import transcribe_file
 from prompts import transcribe_prompt
-from file import TEMPERATURE
 from evaluate import load as load_metric
 
 
@@ -39,9 +39,9 @@ def main():
             start_time = time.time()
 
             for i, sample in enumerate(dataset_iter):
-                # for i, sample in enumerate(
-                #    tqdm(dataset_iter, desc=f"Transcribing {dataset}")
-                # ):
+            #for i, sample in enumerate(
+            #    tqdm(dataset_iter, desc=f"Transcribing {dataset}")
+            #):
                 filename = f"audios/output_{i}.wav"
                 audio = sample["audio"]
                 chunk = audio["array"]
@@ -100,9 +100,9 @@ def main():
 
     # Add configuration info
     lang_stats["configuration"] = {
-        "model": GEMMA_MODEL_ID,
-        "use_vad": USE_VAD,
-        "temperature": TEMPERATURE,
+ #       "model": GEMMA_MODEL_ID,
+#        "use_vad": USE_VAD,
+#        "temperature": TEMPERATURE,
         "samples": MAX_SAMPLES,
         "prompt": transcribe_prompt,
     }
