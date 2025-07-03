@@ -1,30 +1,32 @@
 import os
 import time
 import json
-from itertools import islice
-from tqdm import tqdm
-import soundfile as sf
 import numpy as np
+import soundfile as sf
+from itertools import islice
 from datasets import load_dataset
-from cli import transcribe_file
-from prompts import transcribe_prompt
+from cli import transcribe_file, load_model_and_processor
 from evaluate import load as load_metric
+from prompts import transcribe_prompt
 
 
 def main():
     print("Tool evaluation")
-
     os.environ["HF_HUB_DOWNLOAD_TIMEOUT"] = "60"
-    MAX_SAMPLES = 50
-    datasets = ["mozilla-foundation/common_voice_16_1"]
 
+    MAX_SAMPLES = 50
+    MODEL_NAME = "google/gemma-3n-E4B-it"
+    TEMPERATURE = 0.1
+    USE_VAD = False
+
+    datasets = ["mozilla-foundation/common_voice_16_1"]
     wer_metric = load_metric("wer")
 
-    # Store WERs for each run per dataset
     all_wer_scores = {dataset: [] for dataset in datasets}
     all_stats = {dataset: [] for dataset in datasets}
-
     num_repeats = 1
+
+    model, processor = load_model_and_processor(MODEL_NAME)
 
     for repeat_i in range(num_repeats):
         print(f"\n--- Repeat {repeat_i + 1} / {num_repeats} ---")
@@ -35,23 +37,17 @@ def main():
 
             predictions = []
             references = []
-
             start_time = time.time()
 
             for i, sample in enumerate(dataset_iter):
-            #for i, sample in enumerate(
-            #    tqdm(dataset_iter, desc=f"Transcribing {dataset}")
-            #):
                 filename = f"audios/output_{i}.wav"
                 audio = sample["audio"]
-                chunk = audio["array"]
-                sample_rate = audio["sampling_rate"]
+                sf.write(filename, audio["array"], audio["sampling_rate"])
 
-                sf.write(filename, chunk, sample_rate)
-
-                prediction, elapsed_time = transcribe_file(filename)
-                prediction = str(prediction[0])
-
+                outputs, _ = transcribe_file(
+                    filename, model, processor, transcribe_prompt, TEMPERATURE, USE_VAD
+                )
+                prediction = str(outputs[0])
                 reference = sample["sentence"]
 
                 print(f"Compare '{prediction}' - '{reference}'")
@@ -64,10 +60,10 @@ def main():
             wer_score = (
                 wer_metric.compute(predictions=predictions, references=references) * 100
             )
+
             with open("results.txt", "w", encoding="utf-8") as f:
                 for ref, pred in zip(references, predictions):
-                    f.write(f"{ref}\n")
-                    f.write(f"{pred}\n\n")
+                    f.write(f"{ref}\n{pred}\n\n")
 
             all_wer_scores[dataset].append(wer_score)
             all_stats[dataset].append(
@@ -84,7 +80,7 @@ def main():
             print(f"Total inference time: {total_time:.2f} seconds")
             print(f"Average time per sample: {total_time / sample_count:.2f} seconds")
 
-    # Compute average and std for WER per dataset
+    # Summary
     lang_stats = {}
     for dataset in datasets:
         wer_array = np.array(all_wer_scores[dataset])
@@ -95,14 +91,11 @@ def main():
             "wer_avg": wer,
             "wer_std": std,
         }
-        print(f"WER avg for {dataset}: {wer_score:.2f}")
-        print(f"WER std for {dataset}: {std:.2f}")
 
-    # Add configuration info
     lang_stats["configuration"] = {
- #       "model": GEMMA_MODEL_ID,
-#        "use_vad": USE_VAD,
-#        "temperature": TEMPERATURE,
+        "model": MODEL_NAME,
+        "use_vad": USE_VAD,
+        "temperature": TEMPERATURE,
         "samples": MAX_SAMPLES,
         "prompt": transcribe_prompt,
     }
