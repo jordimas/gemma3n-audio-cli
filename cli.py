@@ -16,7 +16,7 @@ def load_model_and_processor(model_name):
 
 def transcribe_file(filename, model, processor, prompt, temperature, use_vad=False):
     start_time = time.time()
-    all_outputs = process_file(filename, model, processor, prompt, use_vad, temperature)
+    all_outputs = process_file(filename, model, processor, prompt, temperature, use_vad)
     elapsed_time = time.time() - start_time
     return all_outputs, elapsed_time
 
